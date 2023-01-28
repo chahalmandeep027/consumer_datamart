@@ -33,13 +33,47 @@ if __name__ == "__main__":
         database = mysql_config["mysql_conf"]["database"]
         return "jdbc:mysql://{}:{}/{}?autoReconnect=true&useSSL=false".format(host, port, database)
 
-    jdbc_params = {
-        "url": get_mysql_jdbc_url(app_secret),
-        "lowerBound": "1",
-        "upperBound": "100",
-        "dbtable": app_conf["mysql_conf"]["dbtable"],
-        "numPartitions": "2",
-        "partitionColumn": app_conf["mysql_conf"]["partition_column"],
-        "user": app_secret["mysql_conf"]["username"],
-        "password": app_secret["mysql_conf"]["password"]
-    }
+    for src in app_conf['SRC']['MYSQL']:
+        # print(app_conf['SRC']['MYSQL'][src]['dbtable'])
+        # print(app_conf['SRC']['MYSQL'][src]['partition_column'])
+        # print(app_conf['SRC']['MYSQL'][src]['query'])
+        jdbc_params = {
+            "url": get_mysql_jdbc_url(app_secret),
+            "lowerBound": "1",
+            "upperBound": "100",
+            "query": app_conf['SRC']['MYSQL'][src]['query'],
+            "numPartitions": "2",
+            "partitionColumn": app_conf['SRC']['MYSQL'][src]['partition_column'],
+            "user": app_secret["mysql_conf"]["username"],
+            "password": app_secret["mysql_conf"]["password"]
+        }
+
+    # print(jdbcParams)
+
+    # use the ** operator/un-packer to treat a python dictionary as **kwargs
+        print("\nReading data from MySQL DB using SparkSession.read.format(),")
+        srcDF = spark\
+            .read.format("jdbc")\
+            .option("driver", "com.mysql.cj.jdbc.Driver")\
+            .options(**jdbc_params)\
+            .load()
+
+        src.show()
+
+        src.printSchema()
+        src.show(5, False)
+
+        # src.write \
+        #     .mode("overwrite") \
+        #     .partitionBy("ins_dt") \
+        #     .parquet(
+        #         "s3a://" + app_conf["s3_conf"]["s3_bucket"]+app_conf["s3_conf"]["staging_dir"]+"/" + src)
+
+        src.write \
+            .mode("overwrite") \
+            .parquet(
+                "s3a://" + app_conf["s3_conf"]["s3_bucket"]+app_conf["s3_conf"]["staging_dir"]+"/" + src)
+
+    print("Writing SRC data to s3 staging dir complete")
+
+# spark-submit --packages "mysql:mysql-connector-java:8.0.15" dataframe/ingestion/others/systems/mysql_df.py
