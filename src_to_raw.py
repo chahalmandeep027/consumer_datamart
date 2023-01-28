@@ -58,10 +58,10 @@ if __name__ == "__main__":
             .options(**jdbc_params)\
             .load()
 
-        src.show()
+        srcDF.show()
 
-        src.printSchema()
-        src.show(5, False)
+        srcDF.printSchema()
+        srcDF.show(5, False)
 
         # src.write \
         #     .mode("overwrite") \
@@ -69,7 +69,7 @@ if __name__ == "__main__":
         #     .parquet(
         #         "s3a://" + app_conf["s3_conf"]["s3_bucket"]+app_conf["s3_conf"]["staging_dir"]+"/" + src)
 
-        src.write \
+        srcDF.write \
             .mode("overwrite") \
             .parquet(
                 "s3a://" + app_conf["s3_conf"]["s3_bucket"]+app_conf["s3_conf"]["staging_dir"]+"/" + src)
