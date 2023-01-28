@@ -41,7 +41,7 @@ if __name__ == "__main__":
             "url": get_mysql_jdbc_url(app_secret),
             "lowerBound": "1",
             "upperBound": "100",
-            "query": app_conf['SRC']['MYSQL'][src]['query'],
+            "dbtable": app_conf['SRC']['MYSQL'][src]['query'],
             "numPartitions": "2",
             "partitionColumn": app_conf['SRC']['MYSQL'][src]['partition_column'],
             "user": app_secret["mysql_conf"]["username"],
