@@ -1,6 +1,6 @@
 .secrets
 *.pem
 *.ppk
-application.yml
+# application.yml
 spark-man_accessKeys.csv
 create_emr_cluster.py

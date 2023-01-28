@@ -1,0 +1,57 @@
+s3_conf:
+  s3_bucket: consumer-datamart
+  staging_dir: stg
+
+SRC:
+  MYSQL:
+    customer_test:
+      dbtable: testdb.customer_test
+      partition_column: CustomerID
+      query : "(select * from testdb.customer_test ) as t"  
+    individual_test:
+      dbtable: testdb.individual_test
+      partition_column: CustomerID
+      query : "(select * from testdb.individual_test ) as t"  
+    ccard:
+      dbtable: testdb.ccard
+      partition_column: CreditCardID
+      query : "(select * from testdb.ccard ) as t"  
+    store:
+      dbtable: testdb.store
+      partition_column: CustomerID
+      query : "(select * from testdb.store ) as t"  
+    salesterritory:
+      dbtable: testdb.salesterritory
+      partition_column: TerritoryID
+      query : "(select * from testdb.salesterritory ) as t"  
+    salesperson:
+      dbtable: testdb.salesperson
+      partition_column: SalesPersonID
+      query : "(select * from testdb.salesperson ) as t"  
+    salesorderheader:
+      dbtable: testdb.salesorderheader
+      partition_column: SalesOrderID
+      query : "(select * from testdb.salesorderheader ) as t"  
+    salesorderdetail:
+      dbtable: testdb.salesorderdetail
+      partition_column: SalesOrderID
+      query : "(select * from testdb.salesorderdetail ) as t"  
+    specialoffer:
+      dbtable: testdb.specialoffer
+      partition_column: SpecialOfferID
+      query : "(select * from testdb.specialoffer ) as t"  
+
+redshift_conf:
+  filetype: csv
+  delimiter: |
+  dbtable: PUBLIC.TXN_FCT
+  query: SELECT txn_id, create_time, amount, cust_id from PUBLIC.TXN_FCT
+
+# sftp_conf:
+#     filetype: csv
+#     delimiter: |
+#     directory: /home/ubuntu/data
+
+# mongodb_config:
+#   database: school
+#   collection: students
