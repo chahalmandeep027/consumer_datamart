@@ -72,7 +72,7 @@ if __name__ == "__main__":
         srcDF.write \
             .mode("overwrite") \
             .parquet(
-                "s3a://" + app_conf["s3_conf"]["s3_bucket"]+app_conf["s3_conf"]["staging_dir"]+"/" + src)
+                "s3a://" + app_conf["s3_conf"]["s3_bucket"]+"/"+app_conf["s3_conf"]["staging_dir"]+"/" + src)
 
     print("Writing SRC data to s3 staging dir complete")
 
