@@ -90,13 +90,13 @@ redshift_conf:
         WHERE CustomerDim.CustomerID is null' 
 
       bulkUpdateQuery: 'update CustomerDim
-        set CustomerID = isnull(updateRec.CustomerID,CustomerDim.CustomerID),
-        AccountNumber = isnull(updateRec.AccountNumber,CustomerDim.AccountNumber),
-        CustomerType = isnull(updateRec.CustomerType,CustomerDim.CustomerType),
-        Demographics = isnull(updateRec.Demographics,CustomerDim.Demographics),
-        TerritoryID = isnull(updateRec.TerritoryID,CustomerDim.TerritoryID),
-        ModifiedDate = isnull(updateRec.ModifiedDate,CustomerDim.ModifiedDate),
-        updatekey = isnull(updateRec.updatekey,CustomerDim.updatekey)
+        set CustomerDim.CustomerID = nvl(updateRec.CustomerID,CustomerDim.CustomerID),
+        CustomerDim.AccountNumber = nvl(updateRec.AccountNumber,CustomerDim.AccountNumber),
+        CustomerDim.CustomerType = nvl(updateRec.CustomerType,CustomerDim.CustomerType),
+        CustomerDim.Demographics = nvl(updateRec.Demographics,CustomerDim.Demographics),
+        CustomerDim.TerritoryID = nvl(updateRec.TerritoryID,CustomerDim.TerritoryID),
+        CustomerDim.ModifiedDate = nvl(updateRec.ModifiedDate,CustomerDim.ModifiedDate),
+        CustomerDim.updatekey = nvl(updateRec.updatekey,CustomerDim.updatekey)
         from UPDATE_CUSTOMERDIM updateRec
         where updateRec.CustomerID=CustomerDim.CustomerID
         and updateRec.updatekey <> CustomerDim.updatekey' 
