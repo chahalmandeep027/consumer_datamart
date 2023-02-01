@@ -102,6 +102,8 @@ if __name__ == "__main__":
         .mode("overwrite")\
         .save()
 
+    print(app_conf["redshift_conf"]["dim"]["CUSTOMERDIM"]["bulkUpdateQuery"])
+
     spark.read\
         .format("io.github.spark_redshift_community.spark.redshift")\
         .option("url", redshift_jdbc_url) \
