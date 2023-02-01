@@ -42,10 +42,60 @@ SRC:
       query : "(select * from testdb.specialoffer ) as t"  
 
 redshift_conf:
-  filetype: csv
-  delimiter: |
-  dbtable: PUBLIC.TXN_FCT
-  query: SELECT txn_id, create_time, amount, cust_id from PUBLIC.TXN_FCT
+  dim:
+    CUSTOMERDIM:
+      srcQuery: select cus.CustomerID,
+        cus.AccountNumber, 
+        cus.CustomerType, 
+        ind.Demographics, 
+        cus.TerritoryID,
+        cus.ModifiedDate,
+        udfMD5withPython(array(
+        cus.CustomerID,
+        cus.AccountNumber, 
+        cus.CustomerType, 
+        ind.Demographics, 
+        cus.TerritoryID,
+        cus.ModifiedDate
+        )
+        ) AS UpdateKey from CUSTOMER cus join INDIVIDUAL ind on ind.CustomerID = cus.CustomerID 
+      readDimDataQuery: select CustomerKey,
+        CustomerID,
+        AccountNumber, 
+        CustomerType, 
+        Demographics, 
+        TerritoryID,
+        ModifiedDate,
+        updatekey 
+        from CUSTOMERDIM
+      updatesQuery: select CustomerDim.CustomerKey,
+        CustomerStg.CustomerID,
+        CustomerStg.AccountNumber, 
+        CustomerStg.CustomerType, 
+        CustomerStg.Demographics, 
+        CustomerStg.TerritoryID,
+        CustomerStg.ModifiedDate,
+        CustomerStg.updatekey 
+        from CustomerStg INNER 
+        JOIN CustomerDim 
+        ON CustomerStg.CustomerID = CustomerDim.CustomerID
+        WHERE CustomerStg.UpdateKey <> CustomerDim.UpdateKey
+      newQuery: select CustomerDim.*,
+        from CustomerStg LEFT OUTER JOIN
+        JOIN CustomerDim 
+        ON CustomerStg.CustomerID = CustomerDim.CustomerID
+        WHERE CustomerDim.CustomerID is null
+      bulkUpdateQuery: update CustomerDim
+        set CustomerStg.CustomerID = isnull(update.CustomerID,CustomerDim.CustomerID),
+        CustomerStg.AccountNumber = isnull(update.AccountNumber,CustomerDim.AccountNumber),
+        CustomerStg.CustomerType = isnull(update.CustomerType,CustomerDim.CustomerType),
+        CustomerStg.Demographics = isnull(update.Demographics,CustomerDim.Demographics),
+        CustomerStg.TerritoryID = isnull(update.TerritoryID,CustomerDim.TerritoryID),
+        CustomerStg.ModifiedDate = isnull(update.ModifiedDate,CustomerDim.ModifiedDate),
+        CustomerStg.updatekey = isnull(update.updatekey,CustomerDim.updatekey)
+        from UPDATE_CUSTOMERDIM update
+        where update.CustomerID=CustomerDim.CustomerID
+        and update.updatekey <> CustomerDim.updatekey
 
 # sftp_conf:
 #     filetype: csv
