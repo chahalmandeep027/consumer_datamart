@@ -105,6 +105,8 @@ if __name__ == "__main__":
     spark.read\
         .format("io.github.spark_redshift_community.spark.redshift")\
         .option("url", redshift_jdbc_url) \
+        .option("user", app_secret["redshift_conf"]["username"]) \
+        .option("password", app_secret["redshift_conf"]["password"]) \
         .option("query", app_conf["redshift_conf"]["dim"]["CUSTOMERDIM"]["bulkUpdateQuery"]) \
         .option("forward_spark_s3_credentials", "true")\
         .option("tempdir", "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/temp")\
