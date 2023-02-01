@@ -69,18 +69,20 @@ if __name__ == "__main__":
     cus_stg_DF.printSchema()
     cus_stg_DF.createOrReplaceTempView('CustomerStg')
 
-    exit()
-
     redshift_jdbc_url = get_redshift_jdbc_url(app_secret)
 
-    cus_dim_df = spark.read\
+    print(app_conf["redshift_conf"]["dim"]["CUSTOMERDIM"]["readDimDataQuery"])
+
+    spark.read\
         .format("io.github.spark_redshift_community.spark.redshift")\
         .option("url", redshift_jdbc_url) \
+        .option("user", app_secret["redshift_conf"]["username"]) \
+        .option("password", app_secret["redshift_conf"]["password"]) \
         .option("query", app_conf["redshift_conf"]["dim"]["CUSTOMERDIM"]["readDimDataQuery"]) \
         .option("forward_spark_s3_credentials", "true")\
         .option("tempdir", "s3a://" + app_conf["s3_conf"]["s3_bucket"] + "/temp")\
         .load() \
-        .createOrReplaceDimView('CustomerDim')
+        .createOrReplaceTempView('CustomerDim')
 
     update_df = spark.sql(
         app_conf["redshift_conf"]["dim"]["CUSTOMERDIM"]["updatesQuery"])
@@ -110,4 +112,4 @@ if __name__ == "__main__":
 
     print("stg to dim load completed")
 
-# spark-submit --jars "https://s3.amazonaws.com/redshift-downloads/drivers/jdbc/1.2.36.1060/RedshiftJDBC42-no-awssdk-1.2.36.1060.jar" --packages "org.apache.spark:spark-avro_2.11:2.4.2,io.github.spark-redshift-community:spark-redshift_2.11:4.0.1,org.apache.hadoop:hadoop-aws:2.7.4" dataframe/provision/df_redshift.py
+# spark-submit --jars "https://s3.amazonaws.com/redshift-downloads/drivers/jdbc/1.2.36.1060/RedshiftJDBC42-no-awssdk-1.2.36.1060.jar" --packages "org.apache.spark:spark-avro_2.11:2.4.2,io.github.spark-redshift-community:spark-redshift_2.11:4.0.1,org.apache.hadoop:hadoop-aws:2.7.4" raw_to_dim.py
