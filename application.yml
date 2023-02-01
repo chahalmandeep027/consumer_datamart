@@ -58,9 +58,9 @@ redshift_conf:
         cus.TerritoryID,
         cus.ModifiedDate
         )
-        ) AS UpdateKey from CUSTOMER cus join INDIVIDUAL ind on ind.CustomerID = cus.CustomerID ;
+        ) AS UpdateKey from CUSTOMER cus join INDIVIDUAL ind on ind.CustomerID = cus.CustomerID 
 
-      readDimDataQuery: select CustomerKey,
+      readDimDataQuery: 'select CustomerKey,
         CustomerID,
         AccountNumber, 
         CustomerType, 
@@ -68,9 +68,9 @@ redshift_conf:
         TerritoryID,
         ModifiedDate,
         updatekey 
-        from PUBLIC.CUSTOMERDIM ;
+        from PUBLIC.CUSTOMERDIM'
 
-      updatesQuery: select CustomerDim.CustomerKey,
+      updatesQuery: 'select CustomerDim.CustomerKey,
         CustomerStg.CustomerID,
         CustomerStg.AccountNumber, 
         CustomerStg.CustomerType, 
@@ -81,15 +81,15 @@ redshift_conf:
         from CustomerStg INNER 
         JOIN CustomerDim 
         ON CustomerStg.CustomerID = CustomerDim.CustomerID
-        WHERE CustomerStg.UpdateKey <> CustomerDim.UpdateKey ;
+        WHERE CustomerStg.UpdateKey <> CustomerDim.UpdateKey' 
 
-      newQuery: select CustomerDim.*,
+      newQuery: 'select CustomerDim.*,
         from CustomerStg 
         LEFT OUTER JOIN CustomerDim 
         ON CustomerStg.CustomerID = CustomerDim.CustomerID
-        WHERE CustomerDim.CustomerID is null ;
+        WHERE CustomerDim.CustomerID is null' 
 
-      bulkUpdateQuery: update CustomerDim
+      bulkUpdateQuery: 'update CustomerDim
         set CustomerStg.CustomerID = isnull(update.CustomerID,CustomerDim.CustomerID),
         CustomerStg.AccountNumber = isnull(update.AccountNumber,CustomerDim.AccountNumber),
         CustomerStg.CustomerType = isnull(update.CustomerType,CustomerDim.CustomerType),
@@ -99,7 +99,7 @@ redshift_conf:
         CustomerStg.updatekey = isnull(update.updatekey,CustomerDim.updatekey)
         from UPDATE_CUSTOMERDIM update
         where update.CustomerID=CustomerDim.CustomerID
-        and update.updatekey <> CustomerDim.updatekey ;
+        and update.updatekey <> CustomerDim.updatekey' 
 
 # sftp_conf:
 #     filetype: csv
