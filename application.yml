@@ -90,16 +90,16 @@ redshift_conf:
         WHERE CustomerDim.CustomerID is null' 
 
       bulkUpdateQuery: 'update CustomerDim
-        set CustomerStg.CustomerID = isnull(update.CustomerID,CustomerDim.CustomerID),
-        CustomerStg.AccountNumber = isnull(update.AccountNumber,CustomerDim.AccountNumber),
-        CustomerStg.CustomerType = isnull(update.CustomerType,CustomerDim.CustomerType),
-        CustomerStg.Demographics = isnull(update.Demographics,CustomerDim.Demographics),
-        CustomerStg.TerritoryID = isnull(update.TerritoryID,CustomerDim.TerritoryID),
-        CustomerStg.ModifiedDate = isnull(update.ModifiedDate,CustomerDim.ModifiedDate),
-        CustomerStg.updatekey = isnull(update.updatekey,CustomerDim.updatekey)
-        from UPDATE_CUSTOMERDIM update
-        where update.CustomerID=CustomerDim.CustomerID
-        and update.updatekey <> CustomerDim.updatekey' 
+        set CustomerID = isnull(updateRec.CustomerID,CustomerDim.CustomerID),
+        AccountNumber = isnull(updateRec.AccountNumber,CustomerDim.AccountNumber),
+        CustomerType = isnull(updateRec.CustomerType,CustomerDim.CustomerType),
+        Demographics = isnull(updateRec.Demographics,CustomerDim.Demographics),
+        TerritoryID = isnull(updateRec.TerritoryID,CustomerDim.TerritoryID),
+        ModifiedDate = isnull(updateRec.ModifiedDate,CustomerDim.ModifiedDate),
+        updatekey = isnull(updateRec.updatekey,CustomerDim.updatekey)
+        from UPDATE_CUSTOMERDIM updateRec
+        where updateRec.CustomerID=CustomerDim.CustomerID
+        and updateRec.updatekey <> CustomerDim.updatekey' 
 
 # sftp_conf:
 #     filetype: csv
